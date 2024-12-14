@@ -1,1 +1,21 @@
-k
+module router_fifo_tb;
+reg [7:0]data_in;
+reg clock,resetn,soft_reset,write_enb,read_enb,lfd_state;
+wire full,empty;
+wire [7:0]data_out;
+router_fifo dut(data_in,clock,resetn,soft_reset,write_enb,read_enb,lfd_state,full,empty,data_out);
+initial begin
+clock=1;
+forever #5 clock=~clock; end
+initial begin
+resetn=0;soft_reset=1;
+write_enb<=0;read_enb<=0;
+data_in<=8'b0;lfd_state<=0;
+#10 resetn<=1;soft_reset<=0;
+write_enb<=1;read_enb<=0;
+data_in<={$random};lfd_state<=1;
+repeat (3) #10 data_in<={$random};
+#10 read_enb<=1;write_enb<=0;
+#40 write_enb<=1;data_in<={$random};
+#20 $stop;
+end endmodule
